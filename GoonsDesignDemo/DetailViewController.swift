@@ -7,10 +7,17 @@
 
 import UIKit
 
+public protocol DetailViewControllerDelegate: AnyObject {
+    func dismiss()
+}
+
 class DetailViewController: UIViewController {
     public private(set) lazy var nameLabel: UILabel = createNameLabel()
 
-    init() {
+    private weak var delegate: DetailViewControllerDelegate?
+
+    init(delegate: DetailViewControllerDelegate) {
+        self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -23,6 +30,10 @@ class DetailViewController: UIViewController {
         super.viewDidLoad()
 
         self.setupUI()
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        self.delegate?.dismiss()
     }
 }
 
