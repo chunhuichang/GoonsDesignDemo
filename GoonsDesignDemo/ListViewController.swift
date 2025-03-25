@@ -7,10 +7,17 @@
 
 import UIKit
 
+public protocol ListViewControllerDelegate: AnyObject {
+    func goToDetail()
+}
+
 class ListViewController: UIViewController {
     public private(set) lazy var nameLabel: UILabel = createNameLabel()
 
-    init() {
+    private weak var delegate: ListViewControllerDelegate?
+
+    init(delegate: ListViewControllerDelegate) {
+        self.delegate = delegate
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -51,6 +58,13 @@ private extension ListViewController {
         let l = UILabel()
         l.text = "List View"
         l.textColor = .blue
+        l.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.itemClicked))
+        l.addGestureRecognizer(tapGesture)
         return l
+    }
+
+    @objc private func itemClicked() {
+        self.delegate?.goToDetail()
     }
 }
