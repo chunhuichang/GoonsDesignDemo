@@ -16,6 +16,8 @@ public final class AppCoordinator: Coordinator {
     }
 
     public func start() {
-        navigationController.pushViewController(ListViewController(), animated: false)
+        let coordinator = ListCoordinator(navigationController: self.navigationController)
+        add(child: coordinator)
+        coordinator.start()
     }
 }
