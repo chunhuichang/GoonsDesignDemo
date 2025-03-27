@@ -12,17 +12,25 @@ public protocol DetailCoordinatorDelegate: AnyObject {
 }
 
 public final class DetailCoordinator: Coordinator {
+    public struct Params {
+        let entity: RepoEntity
+    }
+
     public var navigationController: UINavigationController
     public var childCoordinators: [Coordinator] = []
     private weak var delegate: DetailCoordinatorDelegate?
+    private let param: Params
 
-    init(navigationController: UINavigationController, delegate: DetailCoordinatorDelegate?) {
+    init(navigationController: UINavigationController, delegate: DetailCoordinatorDelegate?, param: Params) {
         self.navigationController = navigationController
         self.delegate = delegate
+        self.param = param
     }
 
     public func start() {
-        let vc = DetailViewController(delegate: self)
+        let entity = self.param.entity
+        let vm = DetailViewModel(entity: entity)
+        let vc = DetailViewController(delegate: self, viewModel: vm)
         self.navigationController.pushViewController(vc, animated: true)
     }
 }
