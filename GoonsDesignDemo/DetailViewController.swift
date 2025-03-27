@@ -154,8 +154,9 @@ private extension DetailViewController {
 
     func createOwnerImageView() -> UIImageView {
         let v = UIImageView()
-        v.contentMode = .scaleAspectFill
+        v.contentMode = .scaleAspectFit
         v.clipsToBounds = true
+        v.image = UIImage(systemName: "photo.badge.exclamationmark")
         return v
     }
 }
@@ -214,6 +215,7 @@ private extension DetailViewController {
             .store(in: &self.cancellables)
 
         self.viewModel.$ownerAvatarImage
+            .compactMap { $0 }
             .receive(on: DispatchQueue.main)
             .sink { [weak self] image in
                 self?.ownerImageView.image = image
