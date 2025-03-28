@@ -54,7 +54,13 @@ class RepositoryInfoCell: UITableViewCell {
 
 private extension RepositoryInfoCell {
     private func setupUI() {
-        for item in [avatarImageView, titleLabel, descriptionLabel] {
+        let stackView = createStackView()
+        for item in [titleLabel, descriptionLabel] {
+            stackView.addArrangedSubview(item)
+            item.translatesAutoresizingMaskIntoConstraints = false
+        }
+
+        for item in [avatarImageView, stackView] {
             contentView.addSubview(item)
             item.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -65,14 +71,10 @@ private extension RepositoryInfoCell {
             avatarImageView.widthAnchor.constraint(equalToConstant: 50),
             avatarImageView.heightAnchor.constraint(equalTo: avatarImageView.widthAnchor, multiplier: 1),
 
-            titleLabel.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-
-            descriptionLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
-            descriptionLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            descriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            stackView.leadingAnchor.constraint(equalTo: avatarImageView.trailingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
         ])
     }
 }
@@ -98,6 +100,14 @@ private extension RepositoryInfoCell {
         label.font = .systemFont(ofSize: 16)
         label.numberOfLines = 2
         return label
+    }
+
+    func createStackView() -> UIStackView {
+        let v = UIStackView()
+        v.axis = .vertical
+        v.alignment = .fill
+        v.distribution = .fillEqually
+        return v
     }
 }
 
