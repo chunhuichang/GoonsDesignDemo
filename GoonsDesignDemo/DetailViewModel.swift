@@ -35,15 +35,15 @@ class DetailViewModel: ObservableObject {
     private func fetchOwnerAvatar(from urlString: String) {
         guard let url = URL(string: urlString) else { return }
 
-        // TODO: Image cache
-        URLSession.shared.dataTaskPublisher(for: url)
-            .map(\.data)
-            .compactMap { UIImage(data: $0) }
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { _ in },
-                  receiveValue: { [weak self] image in
-                      self?.ownerAvatarImage = image
-                  })
-            .store(in: &self.cancellables)
+        Task {
+            do {
+                let image = try await ImageLoader.shared.loadImage(from: url)
+                await MainActor.run {
+                    self.ownerAvatarImage = image
+                }
+            } catch {
+                print("Failed to load image: \(error)")
+            }
+        }
     }
 }
