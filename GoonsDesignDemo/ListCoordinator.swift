@@ -22,7 +22,7 @@ public final class ListCoordinator: Coordinator {
     }
 }
 
-extension ListCoordinator: ListViewControllerDelegate {
+extension ListCoordinator: ListViewModelDelegate {
     public func goToDetail(entity: RepoEntity) {
         let coordinator = DetailCoordinator(navigationController: self.navigationController, delegate: self, param: DetailCoordinator.Params(entity: entity))
         add(child: coordinator)
