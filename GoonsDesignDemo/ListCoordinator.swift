@@ -16,14 +16,15 @@ public final class ListCoordinator: Coordinator {
     }
 
     public func start() {
-        let vc = ListViewController(delegate: self)
+        let vm = ListViewModel(delegate: self, service: GitHubUserService.shared)
+        let vc = ListViewController(viewModel: vm)
         self.navigationController.pushViewController(vc, animated: false)
     }
 }
 
 extension ListCoordinator: ListViewControllerDelegate {
-    public func goToDetail() {
-        let coordinator = DetailCoordinator(navigationController: self.navigationController, delegate: self)
+    public func goToDetail(entity: RepoEntity) {
+        let coordinator = DetailCoordinator(navigationController: self.navigationController, delegate: self, param: DetailCoordinator.Params(entity: entity))
         add(child: coordinator)
         coordinator.start()
     }
