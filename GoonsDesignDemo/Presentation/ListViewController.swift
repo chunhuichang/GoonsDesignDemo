@@ -66,7 +66,7 @@ private extension ListViewController {
 private extension ListViewController {
     func createTableView() -> UITableView {
         let v = UITableView(frame: .zero, style: .plain)
-        v.register(RepositoryInfoCell.self, forCellReuseIdentifier: "RepositoryInfoCell")
+        v.registerCell(RepositoryInfoCell.self)
         v.delegate = self
         v.dataSource = self
         v.prefetchDataSource = self
@@ -113,7 +113,7 @@ extension ListViewController: UITableViewDataSource {
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "RepositoryInfoCell", for: indexPath) as? RepositoryInfoCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: RepositoryInfoCell.identifier, for: indexPath) as? RepositoryInfoCell else {
             return UITableViewCell()
         }
         let row = viewModel.repos[indexPath.row]
