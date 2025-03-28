@@ -11,9 +11,10 @@ class ListViewModel: ObservableObject {
     // Output
     @Published private(set) var repos: [RepoEntity] = []
     @Published private(set) var errorInput: Bool = false
-    
+
     private weak var delegate: ListViewModelDelegate?
     private let service: GitHubUserServiceProtocol
+    private var searchText: String? = nil
 
     init(delegate: ListViewModelDelegate?, service: GitHubUserServiceProtocol) {
         self.delegate = delegate
@@ -22,6 +23,7 @@ class ListViewModel: ObservableObject {
 
     // Input
     func search(_ key: String?) {
+        searchText = key
         guard let key, !key.isEmpty else {
             errorInput = true
             return
@@ -40,7 +42,12 @@ class ListViewModel: ObservableObject {
         }
     }
 
+    func refreshList() {
+        search(searchText)
+    }
+
     func clear() {
+        searchText = nil
         repos = []
     }
 
