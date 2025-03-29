@@ -68,6 +68,7 @@ private extension RepoSearchHeaderView {
 
 extension RepoSearchHeaderView: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.endEditing(true)
         delegate?.didChangeSearchText(searchBar.text)
     }
 
