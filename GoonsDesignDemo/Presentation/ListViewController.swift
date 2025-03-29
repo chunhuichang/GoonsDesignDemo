@@ -29,6 +29,7 @@ class ListViewController: UIViewController {
         super.viewDidLoad()
 
         setupUI()
+        addGesture()
         bindViewModel()
     }
 }
@@ -63,6 +64,17 @@ private extension ListViewController {
             tableView.topAnchor.constraint(equalTo: s.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: s.bottomAnchor),
         ])
+    }
+
+    func addGesture() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapView))
+        tap.delegate = self
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+
+    @objc func tapView() {
+        tapAction()
     }
 }
 
@@ -133,12 +145,17 @@ extension ListViewController: RepoSearchHeaderViewDelegate {
     func clearText() {
         viewModel.clear()
     }
+
+    func tapAction() {
+        view.endEditing(true)
+    }
 }
 
 // MARK: - UITableViewDelegate
 
 extension ListViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: false)
         viewModel.didSelectRowAt(indexPath.row)
     }
 
@@ -187,6 +204,17 @@ extension ListViewController: UITableViewDataSourcePrefetching {
                 }
             }
         }
+    }
+}
+
+// MARK: UIGestureRecognizerDelegate
+
+extension ListViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view is UITableViewCell || touch.view?.superview is UITableViewCell {
+            return false
+        }
+        return true
     }
 }
 

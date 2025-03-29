@@ -10,6 +10,7 @@ import UIKit
 protocol RepoSearchHeaderViewDelegate: AnyObject {
     func didChangeSearchText(_ text: String?)
     func clearText()
+    func tapAction()
 }
 
 class RepoSearchHeaderView: UITableViewHeaderFooterView {
@@ -20,6 +21,7 @@ class RepoSearchHeaderView: UITableViewHeaderFooterView {
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupUI()
+        addGesture()
     }
 
     @available(*, unavailable)
@@ -27,6 +29,8 @@ class RepoSearchHeaderView: UITableViewHeaderFooterView {
         fatalError("init(coder:) has not been implemented")
     }
 }
+
+// MARK: UI Setting
 
 private extension RepoSearchHeaderView {
     func setupUI() {
@@ -63,6 +67,15 @@ private extension RepoSearchHeaderView {
         s.placeholder = "Enter Keyword to Search"
         s.delegate = self
         return s
+    }
+
+    func addGesture() {
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapAction))
+        contentView.addGestureRecognizer(tap)
+    }
+
+    @objc private func tapAction() {
+        delegate?.tapAction()
     }
 }
 
