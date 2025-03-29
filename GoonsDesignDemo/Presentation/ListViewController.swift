@@ -10,6 +10,7 @@ import UIKit
 
 class ListViewController: UIViewController {
     public private(set) lazy var tableView: UITableView = createTableView()
+    public private(set) lazy var naviBarView: UIView = createNaviBarView()
 
     private let viewModel: ListViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -38,11 +39,24 @@ private extension ListViewController {
     func setupUI() {
         view.backgroundColor = .white
 
+        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
+            let statusBarHeight = window.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+            let navigationBarHeight = navigationController?.navigationBar.frame.height ?? 0
+            let totalHeight = statusBarHeight + navigationBarHeight
+
+            naviBarView.translatesAutoresizingMaskIntoConstraints = false
+            window.addSubview(naviBarView)
+            NSLayoutConstraint.activate([
+                naviBarView.topAnchor.constraint(equalTo: window.topAnchor),
+                naviBarView.leadingAnchor.constraint(equalTo: window.leadingAnchor),
+                naviBarView.trailingAnchor.constraint(equalTo: window.trailingAnchor),
+                naviBarView.heightAnchor.constraint(equalToConstant: totalHeight),
+            ])
+        }
+
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
-
         let s = view.safeAreaLayoutGuide
-
         NSLayoutConstraint.activate([
             tableView.leadingAnchor.constraint(equalTo: s.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: s.trailingAnchor),
@@ -54,7 +68,8 @@ private extension ListViewController {
 
 private extension ListViewController {
     func createTableView() -> UITableView {
-        let v = UITableView(frame: .zero, style: .plain)
+        let v = UITableView(frame: .zero, style: .grouped)
+        v.backgroundColor = .white
         v.registerCell(RepositoryInfoCell.self)
         v.register(RepoSearchHeaderView.self)
         v.estimatedRowHeight = 100
@@ -66,6 +81,33 @@ private extension ListViewController {
         v.refreshControl = UIRefreshControl()
         v.refreshControl?.addTarget(self, action: #selector(refreshList), for: .valueChanged)
 
+        return v
+    }
+
+    func createNaviBarLabel() -> UILabel {
+        let l = UILabel()
+        l.text = "Repository Search"
+        l.font = .boldSystemFont(ofSize: 20)
+        l.textColor = .white
+        l.textAlignment = .center
+        return l
+    }
+
+    func createNaviBarView() -> UIView {
+        let v = UIView()
+        v.backgroundColor = .black.withAlphaComponent(0.7)
+
+        let l = createNaviBarLabel()
+        l.translatesAutoresizingMaskIntoConstraints = false
+        v.addSubview(l)
+
+        NSLayoutConstraint.activate([
+            l.leadingAnchor.constraint(equalTo: v.leadingAnchor),
+            l.trailingAnchor.constraint(equalTo: v.trailingAnchor),
+            l.bottomAnchor.constraint(equalTo: v.bottomAnchor, constant: -12),
+        ])
+
+        v.isHidden = true
         return v
     }
 
@@ -112,6 +154,14 @@ extension ListViewController: UITableViewDelegate {
         }
         headerView.delegate = self
         return headerView
+    }
+
+    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        naviBarView.isHidden = true
+    }
+
+    func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
+        naviBarView.isHidden = false
     }
 }
 
