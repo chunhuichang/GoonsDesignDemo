@@ -10,7 +10,6 @@ import UIKit
 
 class ListViewController: UIViewController {
     public private(set) lazy var tableView: UITableView = createTableView()
-    public private(set) lazy var searchBar = createSearchBar()
 
     private let viewModel: ListViewModel
     private var cancellables = Set<AnyCancellable>()
@@ -39,25 +38,15 @@ private extension ListViewController {
     func setupUI() {
         view.backgroundColor = .white
 
-        navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.title = "Repository Search"
-
-        for item in [searchBar, tableView] {
-            view.addSubview(item)
-            item.translatesAutoresizingMaskIntoConstraints = false
-        }
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
 
         let s = view.safeAreaLayoutGuide
 
         NSLayoutConstraint.activate([
-            searchBar.leadingAnchor.constraint(equalTo: s.leadingAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: s.trailingAnchor),
-            searchBar.topAnchor.constraint(equalTo: s.topAnchor),
-            searchBar.heightAnchor.constraint(equalToConstant: 44),
-
             tableView.leadingAnchor.constraint(equalTo: s.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: s.trailingAnchor),
-            tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
+            tableView.topAnchor.constraint(equalTo: s.topAnchor),
             tableView.bottomAnchor.constraint(equalTo: s.bottomAnchor),
         ])
     }
@@ -66,7 +55,11 @@ private extension ListViewController {
 private extension ListViewController {
     func createTableView() -> UITableView {
         let v = UITableView(frame: .zero, style: .plain)
-        v.register(RepositoryInfoCell.self, forCellReuseIdentifier: "RepositoryInfoCell")
+        v.registerCell(RepositoryInfoCell.self)
+        v.register(RepoSearchHeaderView.self)
+        v.estimatedRowHeight = 100
+        v.rowHeight = UITableView.automaticDimension
+
         v.delegate = self
         v.dataSource = self
         v.prefetchDataSource = self
@@ -77,14 +70,7 @@ private extension ListViewController {
     }
 
     @objc private func refreshList() {
-        viewModel.search(searchBar.text)
-    }
-
-    func createSearchBar() -> UISearchBar {
-        let s = UISearchBar()
-        s.placeholder = "Enter Keyword to Search"
-        s.delegate = self
-        return s
+        viewModel.refreshList()
     }
 
     func showEmptyInputAlert() {
@@ -99,11 +85,33 @@ private extension ListViewController {
     }
 }
 
+extension ListViewController: RepoSearchHeaderViewDelegate {
+    func didChangeSearchText(_ text: String?) {
+        viewModel.search(text)
+    }
+
+    func clearText() {
+        viewModel.clear()
+    }
+}
+
 // MARK: - UITableViewDelegate
 
 extension ListViewController: UITableViewDelegate {
     public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel.didSelectRowAt(indexPath.row)
+    }
+
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        120
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        guard let headerView: RepoSearchHeaderView = tableView.dequeueReusable() else {
+            return nil
+        }
+        headerView.delegate = self
+        return headerView
     }
 }
 
@@ -113,7 +121,7 @@ extension ListViewController: UITableViewDataSource {
     }
 
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "RepositoryInfoCell", for: indexPath) as? RepositoryInfoCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: RepositoryInfoCell.identifier, for: indexPath) as? RepositoryInfoCell else {
             return UITableViewCell()
         }
         let row = viewModel.repos[indexPath.row]
@@ -131,20 +139,6 @@ extension ListViewController: UITableViewDataSourcePrefetching {
                 }
             }
         }
-    }
-}
-
-extension ListViewController: UISearchBarDelegate {
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        viewModel.search(searchBar.text)
-    }
-
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        guard searchText.isEmpty else {
-            return
-        }
-
-        viewModel.clear()
     }
 }
 
