@@ -39,3 +39,7 @@
 ## API Reference
 - API Documentation:
   [GitHub Search Repositories API](https://docs.github.com/en/rest/search/search?apiVersion=2022-11-28#search-repositories)
+
+## Screenshot
+
+![Screenshot](Screenshot.gif)
