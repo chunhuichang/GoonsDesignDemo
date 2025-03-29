@@ -118,9 +118,7 @@ private extension ListViewController {
     func showEmptyInputAlert() {
         let alertController = UIAlertController(title: "Oops!", message: "The data couldn't be read because it is missing.", preferredStyle: .alert)
 
-        let okAction = UIAlertAction(title: "OK", style: .default) { [weak self] _ in
-            self?.tableView.refreshControl?.endRefreshing()
-        }
+        let okAction = UIAlertAction(title: "OK", style: .default)
         alertController.addAction(okAction)
 
         present(alertController, animated: true)
@@ -206,6 +204,10 @@ private extension ListViewController {
 
         viewModel.$errorInput
             .receive(on: DispatchQueue.main)
+            .handleEvents(receiveOutput: { [weak self] _ in
+                self?.tableView.refreshControl?.endRefreshing()
+            })
+            .delay(for: .seconds(0.5), scheduler: DispatchQueue.main)
             .sink { [weak self] isError in
                 guard isError else { return }
                 self?.showEmptyInputAlert()
