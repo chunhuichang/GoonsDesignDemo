@@ -16,7 +16,9 @@ public final class ListCoordinator: Coordinator {
     }
 
     public func start() {
-        let vm = ListViewModel(delegate: self, service: GitHubUserService.shared)
+        let repository = MainGitHubUserRepository()
+        let usecase = GitHubUserService(repository: repository)
+        let vm = ListViewModel(delegate: self, service: usecase)
         let vc = ListViewController(viewModel: vm)
         self.navigationController.pushViewController(vc, animated: false)
     }

@@ -17,26 +17,13 @@ protocol GitHubUserServiceProtocol {
 }
 
 class GitHubUserService: GitHubUserServiceProtocol {
-    static let shared = GitHubUserService()
-    private let session: URLSession = .shared
-    private let baseURL = "https://api.github.com/search/repositories"
+    private let repository: GitHubUserRepository
 
-    private init() {}
+    public init(repository: GitHubUserRepository) {
+        self.repository = repository
+    }
 
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error> {
-        guard let url = URL(string: "\(baseURL)?q=\(queryText)") else {
-            return .failure(ServiceError.badURL)
-        }
-
-        do {
-            let (data, response) = try await session.data(from: url)
-            guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
-                return .failure(ServiceError.invalidResponse)
-            }
-            let result = try JSONDecoder().decode(RepositoryDTO.self, from: data)
-            return .success(result.toDomain())
-        } catch {
-            return .failure(error)
-        }
+        await repository.fetchRepos(queryText: queryText)
     }
 }
