@@ -32,6 +32,26 @@ class ListViewController: UIViewController {
         addGesture()
         bindViewModel()
     }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        updateNaviBarVisibility()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateNaviBarVisibility()
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        if let heightConstraint = naviBarView.constraints.first(where: { $0.firstAttribute == .height }) {
+            let topInset = view.safeAreaInsets.top
+            heightConstraint.constant = topInset
+        }
+        updateNaviBarVisibility()
+    }
 }
 
 // MARK: UI Setting
@@ -40,25 +60,22 @@ private extension ListViewController {
     func setupUI() {
         view.backgroundColor = .white
 
-        if let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) {
-            let statusBarHeight = window.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-            let navigationBarHeight = navigationController?.navigationBar.frame.height ?? 0
-            let totalHeight = statusBarHeight + navigationBarHeight
-
-            naviBarView.translatesAutoresizingMaskIntoConstraints = false
-            window.addSubview(naviBarView)
-            NSLayoutConstraint.activate([
-                naviBarView.topAnchor.constraint(equalTo: window.topAnchor),
-                naviBarView.leadingAnchor.constraint(equalTo: window.leadingAnchor),
-                naviBarView.trailingAnchor.constraint(equalTo: window.trailingAnchor),
-                naviBarView.heightAnchor.constraint(equalToConstant: totalHeight),
-            ])
+        for item in [naviBarView, tableView] {
+            view.addSubview(item)
+            item.translatesAutoresizingMaskIntoConstraints = false
         }
 
-        view.addSubview(tableView)
-        tableView.translatesAutoresizingMaskIntoConstraints = false
+        let statusBarHeight = view.window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
+        let navigationBarHeight = navigationController?.navigationBar.frame.height ?? 0
+        let totalHeight = statusBarHeight + navigationBarHeight
+
         let s = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
+            naviBarView.topAnchor.constraint(equalTo: view.topAnchor),
+            naviBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            naviBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            naviBarView.heightAnchor.constraint(equalToConstant: totalHeight),
+
             tableView.leadingAnchor.constraint(equalTo: s.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: s.trailingAnchor),
             tableView.topAnchor.constraint(equalTo: s.topAnchor),
@@ -75,6 +92,12 @@ private extension ListViewController {
 
     @objc func tapView() {
         tapAction()
+    }
+
+    func updateNaviBarVisibility() {
+        let headerFrame = tableView.rectForHeader(inSection: 0)
+        let headerVisible = tableView.bounds.intersects(headerFrame)
+        naviBarView.isHidden = headerVisible
     }
 }
 
@@ -172,11 +195,11 @@ extension ListViewController: UITableViewDelegate {
     }
 
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        naviBarView.isHidden = true
+        updateNaviBarVisibility()
     }
 
     func tableView(_ tableView: UITableView, didEndDisplayingHeaderView view: UIView, forSection section: Int) {
-        naviBarView.isHidden = false
+        updateNaviBarVisibility()
     }
 }
 
