@@ -36,3 +36,15 @@ struct MainGitHubUserRepository: GitHubUserRepository {
         }
     }
 }
+
+struct MockGitHubUserRepository: GitHubUserRepository {
+    private let result: Result<[RepoEntity], Error>
+
+    public init(result: Result<[RepoEntity], Error> = .success(RepoEntity.mockDatas)) {
+        self.result = result
+    }
+
+    func fetchRepos(queryText: String) async -> Result<[RepoEntity], any Error> {
+        result
+    }
+}
