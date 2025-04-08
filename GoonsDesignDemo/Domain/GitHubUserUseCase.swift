@@ -12,11 +12,11 @@ enum ServiceError: Error {
     case invalidResponse
 }
 
-protocol GitHubUserServiceProtocol {
+protocol GitHubUserUseCase {
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error>
 }
 
-class GitHubUserService: GitHubUserServiceProtocol {
+struct GitHubUserService: GitHubUserUseCase {
     private let repository: GitHubUserRepository
 
     public init(repository: GitHubUserRepository) {
