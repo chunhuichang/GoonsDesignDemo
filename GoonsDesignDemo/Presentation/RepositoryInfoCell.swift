@@ -41,7 +41,7 @@ class RepositoryInfoCell: UITableViewCell {
         imageTask?.cancel()
         imageTask = Task {
             do {
-                let image = try await ImageLoader.shared.loadImage(from: url)
+                let image = try await MainImageRepository.shared.loadImage(from: url)
                 avatarImageView.image = image
             } catch {
                 print("Failed to load image: \(error)")

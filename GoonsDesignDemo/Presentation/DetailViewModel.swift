@@ -37,7 +37,7 @@ class DetailViewModel: ObservableObject {
 
         Task {
             do {
-                let image = try await ImageLoader.shared.loadImage(from: url)
+                let image = try await MainImageRepository.shared.loadImage(from: url)
                 await MainActor.run {
                     self.ownerAvatarImage = image
                 }

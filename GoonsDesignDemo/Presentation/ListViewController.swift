@@ -223,7 +223,7 @@ extension ListViewController: UITableViewDataSourcePrefetching {
         for indexPath in indexPaths {
             if let imageURL = URL(string: viewModel.repos[indexPath.row].ownerAvatarUrl) {
                 Task {
-                    _ = try? await ImageLoader.shared.loadImage(from: imageURL)
+                    _ = try? await MainImageRepository.shared.loadImage(from: imageURL)
                 }
             }
         }

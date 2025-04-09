@@ -1,15 +1,21 @@
 //
-//  ImageLoader.swift
+//  ImageRepository.swift
 //  GoonsDesignDemo
 //
 //  Created by Jill Chang on 2025/3/27.
 //
 import UIKit
 
-class ImageLoader {
-    static let shared = ImageLoader()
-    private let cache = NSCache<NSURL, UIImage>()
+protocol ImageRepository {
+    func loadImage(from url: URL) async throws -> UIImage
+}
 
+class MainImageRepository {
+    static let shared = MainImageRepository()
+    private let cache = NSCache<NSURL, UIImage>()
+}
+
+extension MainImageRepository: ImageRepository {
     func loadImage(from url: URL) async throws -> UIImage {
         if let cachedImage = cache.object(forKey: url as NSURL) {
             return cachedImage
