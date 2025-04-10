@@ -33,7 +33,7 @@ class RepositoryInfoCell: UITableViewCell {
         descriptionLabel.text = nil
     }
 
-    func configure(with entity: RepoEntity) {
+    func configure(with entity: RepoEntity, imageRepository: ImageRepository) {
         titleLabel.text = entity.fullName
         descriptionLabel.text = entity.description
         guard let url = URL(string: entity.ownerAvatarUrl) else { return }
@@ -41,7 +41,7 @@ class RepositoryInfoCell: UITableViewCell {
         imageTask?.cancel()
         imageTask = Task {
             do {
-                let image = try await MainImageRepository.shared.loadImage(from: url)
+                let image = try await imageRepository.loadImage(from: url)
                 avatarImageView.image = image
             } catch {
                 print("Failed to load image: \(error)")

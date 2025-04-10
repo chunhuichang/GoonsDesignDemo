@@ -11,8 +11,12 @@ protocol ImageRepository {
 }
 
 class MainImageRepository {
-    static let shared = MainImageRepository()
     private let cache = NSCache<NSURL, UIImage>()
+    private let session: URLSession
+
+    public init(session: URLSession = .shared) {
+        self.session = session
+    }
 }
 
 extension MainImageRepository: ImageRepository {

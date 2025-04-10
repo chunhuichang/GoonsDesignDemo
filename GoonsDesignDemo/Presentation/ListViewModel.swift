@@ -54,6 +54,10 @@ class ListViewModel: ObservableObject {
     func didSelectRowAt(_ index: Int) {
         delegate?.goToDetail(entity: repos[index])
     }
+    
+    func getImageRepository() -> ImageRepository {
+        usecase.getImageRepository()
+    }
 }
 
 public protocol ListViewModelDelegate: AnyObject {

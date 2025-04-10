@@ -19,8 +19,10 @@ class DetailViewModel: ObservableObject {
     @Published private(set) var issuesText: String
 
     private var cancellables = Set<AnyCancellable>()
+    private let imageRepository: ImageRepository
 
-    init(entity: RepoEntity) {
+    init(entity: RepoEntity, imageRepository: ImageRepository) {
+        self.imageRepository = imageRepository
         self.nameText = entity.name
         self.fullNameText = entity.fullName
         self.languageText = "Written in \(entity.language)"
@@ -37,7 +39,7 @@ class DetailViewModel: ObservableObject {
 
         Task {
             do {
-                let image = try await MainImageRepository.shared.loadImage(from: url)
+                let image = try await imageRepository.loadImage(from: url)
                 await MainActor.run {
                     self.ownerAvatarImage = image
                 }

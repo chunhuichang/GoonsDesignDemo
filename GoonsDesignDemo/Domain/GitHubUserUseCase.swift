@@ -14,16 +14,23 @@ enum ServiceError: Error {
 
 protocol GitHubUserUseCase {
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error>
+    func getImageRepository() -> ImageRepository
 }
 
 struct GitHubUserService: GitHubUserUseCase {
     private let repository: GitHubUserRepository
+    private let imageRepository: ImageRepository
 
-    public init(repository: GitHubUserRepository) {
+    public init(repository: GitHubUserRepository, imageRepository: ImageRepository) {
         self.repository = repository
+        self.imageRepository = imageRepository
     }
 
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error> {
         await repository.fetchRepos(queryText: queryText)
+    }
+
+    func getImageRepository() -> ImageRepository {
+        imageRepository
     }
 }
