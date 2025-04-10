@@ -4,14 +4,14 @@
 //
 //  Created by Jill Chang on 2025/3/27.
 //
-import UIKit
+import Foundation
 
 protocol ImageRepository {
-    func loadImage(from url: URL) async throws -> UIImage
+    func loadImageData(from url: URL) async throws -> Data
 }
 
 class MainImageRepository {
-    private let cache = NSCache<NSURL, UIImage>()
+    private let cache = NSCache<NSURL, NSData>()
     private let session: URLSession
 
     public init(session: URLSession = .shared) {
@@ -20,15 +20,14 @@ class MainImageRepository {
 }
 
 extension MainImageRepository: ImageRepository {
-    func loadImage(from url: URL) async throws -> UIImage {
+    func loadImageData(from url: URL) async throws -> Data {
         if let cachedImage = cache.object(forKey: url as NSURL) {
-            return cachedImage
+            return cachedImage as Data
         }
 
         let (data, _) = try await URLSession.shared.data(from: url)
-        guard let image = UIImage(data: data) else { throw URLError(.badServerResponse) }
 
-        cache.setObject(image, forKey: url as NSURL)
-        return image
+        cache.setObject(data as NSData, forKey: url as NSURL)
+        return data
     }
 }

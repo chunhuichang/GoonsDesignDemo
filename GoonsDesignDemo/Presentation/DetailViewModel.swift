@@ -39,9 +39,9 @@ class DetailViewModel: ObservableObject {
 
         Task {
             do {
-                let image = try await imageRepository.loadImage(from: url)
+                let data = try await imageRepository.loadImageData(from: url)
                 await MainActor.run {
-                    self.ownerAvatarImage = image
+                    self.ownerAvatarImage = UIImage(data: data)
                 }
             } catch {
                 print("Failed to load image: \(error)")
