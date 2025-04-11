@@ -40,7 +40,7 @@ struct MainGitHubUserRepository: GitHubUserRepository {
 struct MockGitHubUserRepository: GitHubUserRepository {
     private let result: Result<[RepoEntity], Error>
 
-    public init(result: Result<[RepoEntity], Error> = .success(RepoEntity.mockDatas)) {
+    public init(result: Result<[RepoEntity], Error> = .success(RepoEntity.getMockDatas())) {
         self.result = result
     }
 

@@ -158,4 +158,8 @@ extension RepoEntity {
             issues: 18
         )
     ]
+
+    static func getMockDatas(_ repeatCount: Int = 10) -> [RepoEntity] {
+        Array(repeating: mockDatas, count: repeatCount).flatMap { $0 }
+    }
 }
