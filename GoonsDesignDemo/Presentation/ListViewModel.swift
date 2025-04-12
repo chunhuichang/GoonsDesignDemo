@@ -13,12 +13,12 @@ class ListViewModel: ObservableObject {
     @Published private(set) var errorInput: Bool = false
 
     private weak var delegate: ListViewModelDelegate?
-    private let service: GitHubUserServiceProtocol
+    private let usecase: GitHubUserUseCase
     private var searchText: String? = nil
 
-    init(delegate: ListViewModelDelegate?, service: GitHubUserServiceProtocol) {
+    init(delegate: ListViewModelDelegate?, usecase: GitHubUserUseCase) {
         self.delegate = delegate
-        self.service = service
+        self.usecase = usecase
     }
 
     // Input
@@ -29,7 +29,7 @@ class ListViewModel: ObservableObject {
             return
         }
         Task {
-            let result = await service.fetchRepos(queryText: key)
+            let result = await usecase.fetchRepos(queryText: key)
 
             switch result {
             case .success(let items):
@@ -53,6 +53,10 @@ class ListViewModel: ObservableObject {
 
     func didSelectRowAt(_ index: Int) {
         delegate?.goToDetail(entity: repos[index])
+    }
+    
+    func getImageRepository() -> ImageRepository {
+        usecase.getImageRepository()
     }
 }
 

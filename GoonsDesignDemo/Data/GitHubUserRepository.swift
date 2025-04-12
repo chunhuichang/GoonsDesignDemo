@@ -1,27 +1,23 @@
 //
-//  GitHubUserService.swift
+//  GitHubUserRepository.swift
 //  GoonsDesignDemo
 //
-//  Created by Jill Chang on 2025/3/27.
+//  Created by Jill Chang on 2025/4/8.
 //
 
 import Foundation
 
-enum ServiceError: Error {
-    case badURL
-    case invalidResponse
-}
-
-protocol GitHubUserServiceProtocol {
+protocol GitHubUserRepository {
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error>
 }
 
-class GitHubUserService: GitHubUserServiceProtocol {
-    static let shared = GitHubUserService()
-    private let session: URLSession = .shared
+struct MainGitHubUserRepository: GitHubUserRepository {
+    private let session: URLSession
     private let baseURL = "https://api.github.com/search/repositories"
 
-    private init() {}
+    public init(session: URLSession = .shared) {
+        self.session = session
+    }
 
     func fetchRepos(queryText: String) async -> Result<[RepoEntity], Error> {
         guard let url = URL(string: "\(baseURL)?q=\(queryText)") else {
@@ -38,5 +34,17 @@ class GitHubUserService: GitHubUserServiceProtocol {
         } catch {
             return .failure(error)
         }
+    }
+}
+
+struct MockGitHubUserRepository: GitHubUserRepository {
+    private let result: Result<[RepoEntity], Error>
+
+    public init(result: Result<[RepoEntity], Error> = .success(RepoEntity.getMockDatas())) {
+        self.result = result
+    }
+
+    func fetchRepos(queryText: String) async -> Result<[RepoEntity], any Error> {
+        result
     }
 }

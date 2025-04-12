@@ -14,6 +14,7 @@ public protocol DetailCoordinatorDelegate: AnyObject {
 public final class DetailCoordinator: Coordinator {
     public struct Params {
         let entity: RepoEntity
+        let imageRepository: ImageRepository
     }
 
     public var navigationController: UINavigationController
@@ -28,8 +29,7 @@ public final class DetailCoordinator: Coordinator {
     }
 
     public func start() {
-        let entity = self.param.entity
-        let vm = DetailViewModel(entity: entity)
+        let vm = DetailViewModel(entity: self.param.entity, imageRepository: self.param.imageRepository)
         let vc = DetailViewController(delegate: self, viewModel: vm)
         self.navigationController.pushViewController(vc, animated: true)
     }

@@ -221,5 +221,16 @@ private extension DetailViewController {
                 self?.ownerImageView.image = image
             }
             .store(in: &self.cancellables)
+
+        self.viewModel.$isLoading
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] isLoading in
+                if isLoading {
+                    self?.ownerImageView.addSkeleton()
+                } else {
+                    self?.ownerImageView.removeSkeleton()
+                }
+            }
+            .store(in: &self.cancellables)
     }
 }
