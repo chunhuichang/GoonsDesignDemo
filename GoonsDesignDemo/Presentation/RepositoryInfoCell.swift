@@ -28,12 +28,15 @@ class RepositoryInfoCell: UITableViewCell {
         super.prepareForReuse()
         imageTask?.cancel()
         imageTask = nil
+        avatarImageView.removeSkeleton()
         avatarImageView.image = UIImage(systemName: "photo.badge.exclamationmark")
         titleLabel.text = nil
         descriptionLabel.text = nil
     }
 
     func configure(with entity: RepoEntity, imageRepository: ImageRepository) {
+        avatarImageView.addSkeleton()
+        avatarImageView.image = UIImage(systemName: "photo.badge.exclamationmark")
         titleLabel.text = entity.fullName
         descriptionLabel.text = entity.description
         guard let url = URL(string: entity.ownerAvatarUrl) else { return }
@@ -42,8 +45,10 @@ class RepositoryInfoCell: UITableViewCell {
         imageTask = Task {
             do {
                 let data = try await imageRepository.loadImageData(from: url)
+                avatarImageView.removeSkeleton()
                 avatarImageView.image = UIImage(data: data)
             } catch {
+                avatarImageView.removeSkeleton()
                 print("Failed to load image: \(error)")
             }
         }
@@ -107,6 +112,7 @@ private extension RepositoryInfoCell {
         v.axis = .vertical
         v.alignment = .fill
         v.distribution = .fillEqually
+        v.spacing = 4
         return v
     }
 }

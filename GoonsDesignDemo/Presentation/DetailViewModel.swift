@@ -17,6 +17,7 @@ class DetailViewModel: ObservableObject {
     @Published private(set) var watchersText: String
     @Published private(set) var forksText: String
     @Published private(set) var issuesText: String
+    @Published private(set) var isLoading: Bool = false
 
     private var cancellables = Set<AnyCancellable>()
     private let imageRepository: ImageRepository
@@ -38,10 +39,12 @@ class DetailViewModel: ObservableObject {
         guard let url = URL(string: urlString) else { return }
 
         Task {
+            self.isLoading = true
             do {
                 let data = try await imageRepository.loadImageData(from: url)
                 await MainActor.run {
                     self.ownerAvatarImage = UIImage(data: data)
+                    self.isLoading = false
                 }
             } catch {
                 print("Failed to load image: \(error)")
